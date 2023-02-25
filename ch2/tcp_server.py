@@ -8,7 +8,7 @@ def main():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # 1) IP and Port we want the server to listen on. [IP:Port listening... |} <- client requests]
     server.bind((IP, PORT))
-    # 2) Listen |} <<<
+    # 2) Listen |} <<<<<
     server.listen(5)
     print(f'[*] Listening on {IP}:{PORT}')
     
