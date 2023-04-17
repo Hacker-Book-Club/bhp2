@@ -42,11 +42,11 @@ def receive_from(connection):
         pass
     return buffer
 
-def request_handle(buffer):
+def request_handler(buffer):
     # perform packet modification
-    return cmd_buffer
+    return buffer
 
-def respone_handler(buffer):
+def response_handler(buffer):
     # perform packet modification
     return buffer
 
@@ -73,16 +73,16 @@ def proxy_handler(client_socket, remote_host, remote_port, receive_first):
             print(line)
             hexdump(local_buffer)
 
-            local_buffer = request_handles(local_buffer)
+            local_buffer = request_handler(local_buffer)
             remote_socket.send(local_buffer)
-            print("[==>] Sent to remote".)
+            print("[==>] Sent to remote")
 
         remote_buffer = request_handler(local_buffer)
         if len(remote_buffer):
             print("[==>] Received %d bytes from remote." % len(remote_buffer))
             hexdump(remote_buffer)
 
-            remote_buffer = response_handler(remote_buffer):
+            remote_buffer = response_handler(remote_buffer)
             client_socket.send(remote_buffer)
             print("[<==] Sent to localhost.")
 
@@ -93,3 +93,31 @@ def proxy_handler(client_socket, remote_host, remote_port, receive_first):
             break
 
 ## TODO: Pg23 -> server_loop function
+def server_loop(local_host, local_port,
+                remote_host, remote_port, receive_first):
+    # 1) Creating a socket for the server_loop function
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        # 2) Bind to local host and listen on the port
+        server.bind((local_host, local_port))
+    except Exception as e:
+        print("problem on bind: %r" % e)
+        
+        print("[!!] Failed to list on %s:%d" % (local_host, local_port))
+        print("[!!] Check for other listening sockets or correct permissions.")
+        sys.exit(0)
+    print("[*] Listening on %s:%d" % (local_host, local_port))
+    server.listen(5)
+    # 3) Main loop! - When incoming connection request, hand off to proxy_handler in a new thread.
+    while True:
+        client_socket, addr = server.accept()
+        # print out the local connection information
+        line = "> Received incoming connection from %s:%d" % (addr[0], addr[1])
+        print(line)
+        # start a thread to talk to the remote host
+        # 4) sending and receving of bit to either side of the data stream is handled in the threads generated.
+        proxy_thread = threading.Thread(
+            target=proxy_handler,
+            args=(client_socket, remote_host,
+            remote_port, receive_first)
+        )
