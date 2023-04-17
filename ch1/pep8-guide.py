@@ -1,4 +1,4 @@
-# 1) form of: from XXX import YYY
+# 1) form of: from AAA import BBB
 from lxml import etree
 from subprocess import Popen
 
