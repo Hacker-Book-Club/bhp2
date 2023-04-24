@@ -27,5 +27,3 @@ if __name__ == '__main__':
     cmd = input('Enter command or <CR>: ') or 'id'
     # 5) Get IP, Port, and Command to send.
     ssh_command(ip, port, user, password, cmd)
-
-## TODO Make ssh_rcmd.py file next!
