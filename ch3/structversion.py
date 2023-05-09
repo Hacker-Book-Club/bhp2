@@ -35,6 +35,6 @@ class ICMP:
         self.sum = header[2]
         self.id = header[3]
         self.seq = header[4]
+        mypacket = IP(buff)
+        print(f'{mypacket.src_address} -> {mypacket.dst_address}')
 
-mypacket = IP(buff)
-print(f'{mypacket.src_address} -> {mypacket.dst_address}')
