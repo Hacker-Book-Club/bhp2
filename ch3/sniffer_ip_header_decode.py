@@ -16,6 +16,8 @@ from ctypes import *
 host = "192.168.186.13"
 
 # our IP header
+
+
 class IP(Structure):
     _fields_ = [
         ("ihl", c_ubyte, 4),
