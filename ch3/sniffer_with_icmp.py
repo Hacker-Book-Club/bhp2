@@ -6,24 +6,23 @@ import sys
 
 from ctypes import *
 
-# host to listen on 
-host = '192.168.186.13'
+# host to listen on (computer you are running it from)
+host = "192.168.186.13"
 
 
 class IP(Structure):
-    
     _fields_ = [
-        ("ihl",           c_ubyte, 4),
-        ("version",       c_ubyte, 4),
-        ("tos",           c_ubyte),
-        ("len",           c_ushort),
-        ("id",            c_ushort),
-        ("offset",        c_ushort),
-        ("ttl",           c_ubyte),
-        ("protocol_num",  c_ubyte),
-        ("sum",           c_ushort),
-        ("src",           c_uint32),
-        ("dst",           c_uint32)
+        ("ihl", c_ubyte, 4),
+        ("version", c_ubyte, 4),
+        ("tos", c_ubyte),
+        ("len", c_ushort),
+        ("id", c_ushort),
+        ("offset", c_ushort),
+        ("ttl", c_ubyte),
+        ("protocol_num", c_ubyte),
+        ("sum", c_ushort),
+        ("src", c_uint32),
+        ("dst", c_uint32),
     ]
 
     def __new__(cls, socket_buffer=None):
@@ -34,28 +33,28 @@ class IP(Structure):
 
         # map protocol constants to their names
         self.protocol_map = {1: "ICMP", 6: "TCP", 17: "UDP"}
-        
+
         # human readable IP addresses
         self.src_address = socket.inet_ntoa(struct.pack("@I", self.src))
         self.dst_address = socket.inet_ntoa(struct.pack("@I", self.dst))
-    
+
         # human readable protocol
         try:
             self.protocol = self.protocol_map[self.protocol_num]
         except IndexError:
             self.protocol = str(self.protocol_num)
 
+
 # 1) This is creating the structure of our ICMP traffic.
 class ICMP(Structure):
-    
     _fields_ = [
-        ("type",         c_ubyte),
-        ("code",         c_ubyte),
-        ("checksum",     c_ushort),
-        ("unused",       c_ushort),
-        ("next_hop_mtu", c_ushort)
-        ]
-    
+        ("type", c_ubyte),
+        ("code", c_ubyte),
+        ("checksum", c_ushort),
+        ("unused", c_ushort),
+        ("next_hop_mtu", c_ushort),
+    ]
+
     def __new__(cls, socket_buffer):
         return cls.from_buffer_copy(socket_buffer)
 
@@ -65,10 +64,10 @@ class ICMP(Structure):
 
 # create a raw socket and bind it to the public interface
 if os.name == "nt":
-    socket_protocol = socket.IPPROTO_IP 
+    socket_protocol = socket.IPPROTO_IP
 else:
     socket_protocol = socket.IPPROTO_ICMP
-    
+
 sniffer = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket_protocol)
 
 sniffer.bind((host, 0))
@@ -86,28 +85,23 @@ try:
     while True:
         # read in a single packet
         raw_buffer = sniffer.recvfrom(65535)[0]
-        
+
         # create an IP header from the first 20 bytes of the buffer
         ip_header = IP(raw_buffer[:20])
-      
 
         # 2) if it's ICMP we want it
         if ip_header.protocol == "ICMP":
-            print("Protocol: %s %s -> %s" % (
-                ip_header.protocol,
-                ip_header.src_address,
-                ip_header.dst_address)
-              )
+            print(
+                "Protocol: %s %s -> %s"
+                % (ip_header.protocol, ip_header.src_address, ip_header.dst_address)
+            )
             # 3) calculate where our ICMP packet starts
             offset = ip_header.ihl * 4
-            buf = raw_buffer[offset:offset + sizeof(ICMP)]
+            buf = raw_buffer[offset : offset + sizeof(ICMP)]
             # 4) create our ICMP structure
             icmp_header = ICMP(buf)
-            
-            print("ICMP -> Type: %d Code: %d" % (
-                icmp_header.type,
-                icmp_header.code)
-                  )
+
+            print("ICMP -> Type: %d Code: %d" % (icmp_header.type, icmp_header.code))
 
         # handle CTRL-C
 except KeyboardInterrupt:

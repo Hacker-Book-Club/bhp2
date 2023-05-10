@@ -8,11 +8,12 @@ import time
 
 from ctypes import *
 
-# host to listen on
+# subnet to scan for live hosts
 SUBNET = "192.168.1.0/24"
 # magic string we'll check ICMP responses for
 MESSAGE = "PYTHONRULES!"
 
+# host to listen on
 host = "192.168.1.108"
 
 
