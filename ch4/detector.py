@@ -1,10 +1,13 @@
+import cv2
+import os
+
 ROOT = "/root/Desktop/pictures"
 FACES = "/root/Desktop/faces"
 TRAIN = "/root/Desktop/training"
 
 
 def detect(srcdir=ROOT, tgtdir=FACES, train_dir=TRAIN):
-    for fname in os.listdir(src):
+    for fname in os.listdir(srcdir):
         # 1) Looking through the source directory for jpgs
         if not fname.upper().endswith(".JPG"):
             continue
@@ -38,5 +41,5 @@ def detect(srcdir=ROOT, tgtdir=FACES, train_dir=TRAIN):
         cv2.imwrite(newname, img)
 
 
-if name == "__main__":
+if __name__ == "__main__":
     detect()
